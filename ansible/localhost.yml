@@ -1,0 +1,43 @@
+- hosts: localhost
+  connection: local
+  gather_facts: no           
+  sudo: no
+  vars:
+    homebrew_taps:
+      - caskroom/cask
+    packages_cask1:
+      - { name: java }
+    packages_brew1:
+      - { name: brew-cask }
+      - { name: git }
+      - { name: maven }
+      - { name: tig }
+    packages_cask2:
+      - { name: electrum }
+      - { name: intellij-idea }
+      - { name: iterm2 }
+      - { name: karabiner }
+      - { name: kobito }
+      - { name: vagrant }
+      - { name: virtualbox }
+      - { name: vlc }
+
+  tasks:
+    - name: homebrew の tap リポジトリを追加
+      homebrew_tap: tap={{ item }} state=present
+      with_items: homebrew_taps
+
+    - name: homebrew をアップデート
+      homebrew: update_homebrew=yes
+
+    - include: cask.yml
+      vars:
+        packages: "{{ packages_cask1 }}"
+
+    - include: brew.yml
+      vars:
+        packages: "{{ packages_brew1 }}"
+
+    - include: cask.yml
+      vars:
+        packages: "{{ packages_cask2 }}"
